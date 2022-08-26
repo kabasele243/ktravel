@@ -12,15 +12,16 @@ import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 
-// import { AppError } from '../utils/appError';
+import AppError from './utils/appError.js';
+
 // import { globalErrorHandler } from '../controllers/errorController.js';
-// import tourRouter from './routes/tourRoutes.js';
 // import userRouter from './routes/userRoutes';
 // import reviewRouter from './routes/reviewRoutes';
 // import bookingRouter from './routes/bookingRoutes';
 // import bookingController from './controllers/bookingController';
 // import viewRouter from './routes/viewRoutes';
 import tourRoute from './routes/tourRouter.js';
+import userRoute from './routes/userRouter.js';
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -96,28 +97,16 @@ app.use(
 
 app.use(compression());
 
-// Test middleware
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  // console.log(req.cookies);
-  next();
-});
-
 // 3) ROUTES
-// app.use('/', (req,res) => {
-//   res.send({
-//     "name": "hello world"
-//   })
-// })
 // app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRoute);
-// app.use('/api/v1/users', userRouter);
+app.use('/api/v1/users', userRoute);
 // app.use('/api/v1/reviews', reviewRouter);
 // app.use('/api/v1/bookings', bookingRouter);
 
-// app.all('*', (req, res, next) => {
-//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-// });
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
 
 // app.use(globalErrorHandler);
 
