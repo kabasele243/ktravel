@@ -1,4 +1,12 @@
 ./node_modules
 node_modules
-config.env
-config-dev.env
+./config
+/config
+config
+test.config.env
+config
+/config
+./config
+models
+plus
+
