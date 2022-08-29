@@ -22,9 +22,9 @@ import AppError from './utils/appError.js';
 // import viewRouter from './routes/viewRoutes';
 import tourRoute from './routes/tourRouter.js';
 import userRoute from './routes/userRouter.js';
-const __filename = fileURLToPath(import.meta.url);
+// const __filename = fileURLToPath(import.meta.url);
 
-const __dirname = path.dirname(__filename);
+// const __dirname = path.dirname(__filename);
 
 
 // Start express app
@@ -35,21 +35,14 @@ const app = express();
 app.enable('trust proxy');
 
 app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
-
-// 1) GLOBAL MIDDLEWARES
-// Implement CORS
+// app.set('views', path.join(__dirname, 'views'));
 app.use(cors());
-
 app.options('*', cors());
-// app.options('/api/v1/tours/:id', cors());
 
 // Serving static files
-app.use(express.static(path.join(__dirname, 'public')));
-
+// app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
 app.use(helmet());
-
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -99,6 +92,10 @@ app.use(compression());
 
 // 3) ROUTES
 // app.use('/', viewRouter);
+app.use('/happy', (req, res) => {
+  res.json({'hello world': "my friend"})
+})
+
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 // app.use('/api/v1/reviews', reviewRouter);

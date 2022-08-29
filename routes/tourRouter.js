@@ -34,7 +34,8 @@ router
   .get(getToursWithin);
 
 
-router.route('/distances/:latlng/unit/:unit').get(getDistances);
+router.route('/distances/:latlng/unit/:unit')
+  .get(getDistances);
 
 router
   .route('/')

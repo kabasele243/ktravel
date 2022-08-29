@@ -12,6 +12,7 @@ const signToken = id => {
 };
 
 const createSendToken = (user, statusCode, req, res) => {
+
   const token = signToken(user._id);
 
   res.cookie('jwt', token, {
@@ -35,7 +36,7 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 const signup = catchAsyncs(async (req, res, next) => {
-  const newUser = await User.create({
+  const newUser = await UserModel.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
@@ -43,9 +44,8 @@ const signup = catchAsyncs(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  // console.log(url);
-  await new Email(newUser, url).sendWelcome();
 
+  // await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, req, res);
 });
 
@@ -57,12 +57,12 @@ const login = catchAsyncs(async (req, res, next) => {
     return next(new AppError('Please provide email and password!', 400));
   }
   // 2) Check if user exists && password is correct
-  const user = await User.findOne({ email }).select('+password');
+  const user = await UserModel.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
-
+  console.log({user})
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
 });
@@ -97,7 +97,7 @@ const protect = catchAsyncs(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exists
-  const currentUser = await User.findById(decoded.id);
+  const currentUser = await UserModel.findById(decoded.id);
   if (!currentUser) {
     return next(
       new AppError(
@@ -131,7 +131,7 @@ const isLoggedIn = async (req, res, next) => {
       );
 
       // 2) Check if user still exists
-      const currentUser = await User.findById(decoded.id);
+      const currentUser = await UserModel.findById(decoded.id);
       if (!currentUser) {
         return next();
       }
@@ -167,7 +167,7 @@ const restrictTo = (...roles) => {
 
 const forgotPassword = catchAsyncs(async (req, res, next) => {
   // 1) Get user based on POSTed email
-  const user = await User.findOne({ email: req.body.email });
+  const user = await UserModel.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError('There is no user with email address.', 404));
   }
@@ -228,7 +228,7 @@ const resetPassword = catchAsyncs(async (req, res, next) => {
 
 const updatePassword = catchAsyncs(async (req, res, next) => {
   // 1) Get user from collection
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await UserModel.findById(req.user.id).select('+password');
 
   // 2) Check if POSTed current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
